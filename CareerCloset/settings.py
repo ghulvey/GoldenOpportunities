@@ -10,9 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 from pathlib import Path
-import CareerCloset.secrets as secrets
 import os
 from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'mozilla_django_oidc',
     'access',
+    "inventory",
     'django_htmx',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +62,7 @@ ROOT_URLCONF = "CareerCloset.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates', BASE_DIR / 'auth/templates'],
+        "DIRS": [BASE_DIR / 'templates', BASE_DIR / 'auth/templates', BASE_DIR / 'inventory/templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -103,6 +105,14 @@ Database Settings
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
+    "postgres": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv('POSTGRES_DB'),
+        "USER": os.getenv('POSTGRES_USER'),
+        "PASSWORD": os.getenv('POSTGRES_PASSWORD'),
+        "HOST": os.getenv('POSTGRES_HOST'),
+        "PORT": os.getenv('POSTGRES_PORT'),
+    },
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
@@ -124,6 +134,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+"""
+Storage Settings
+"""
+
+AWS_ACCESS_KEY_ID = os.getenv('S3_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('S3_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = os.getenv('S3_ENDPOINT_URL')
+AWS_S3_REGION_NAME = os.getenv('S3_REGION')
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+
+
+MEDIA_URL = os.getenv('S3_MEDIA_URL')
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 """
 Authentication Settings
